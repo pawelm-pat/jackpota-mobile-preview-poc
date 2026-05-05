@@ -144,12 +144,25 @@ async function proxyRequest(
   let responseBody: BodyInit | null;
 
   if (upstreamContentType.includes("text/html")) {
-    // Rewrite absolute jackpota.com references so all navigation stays in-proxy
     let html = await upstream.text();
+
+    // Rewrite absolute jackpota.com references so navigation/redirects stay in-proxy
     html = html.replace(
       new RegExp(ORIGIN.replace(/\./g, "\\."), "g"),
       "/api/proxy"
     );
+
+    // Inject a <base> tag so all relative URLs (/_next/static/*, images, etc.)
+    // resolve back to jackpota.com — otherwise they 404 on the Vercel app.
+    const baseTag = `<base href="${ORIGIN}/">`;
+    if (html.includes("<head>")) {
+      html = html.replace("<head>", `<head>${baseTag}`);
+    } else if (html.includes("<HEAD>")) {
+      html = html.replace("<HEAD>", `<HEAD>${baseTag}`);
+    } else {
+      html = baseTag + html;
+    }
+
     responseBody = html;
   } else {
     // Stream binary / JSON / JS / CSS unchanged
