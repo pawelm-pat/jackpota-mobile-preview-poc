@@ -47,29 +47,28 @@ const STEP_SEQUENCE = [18, 14, 23, 11, 17, 20, 13, 16, 28];
 ───────────────────────────────────────────── */
 // Clockwise from top, matching the reference wheel image exactly
 // ─── Wheel segments (clockwise, index 0 = top = Ultra) ───────────────────────
-// Colors: dark navy #0c1b6e | royal blue #1e44c4 | grand = amber gradient
 const SEGMENTS = [
-  { label: "Ultra", fill: "url(#ultraSegGrad)", textFill: "url(#ultraTextGrad)", special: true  },
-  { label: "Mini",  fill: "#0c1b6e",             textFill: "#ffffff",             special: false },
-  { label: "Minor", fill: "#1e44c4",             textFill: "#ffffff",             special: false },
-  { label: "Major", fill: "#0c1b6e",             textFill: "#ffffff",             special: false },
-  { label: "Grand", fill: "url(#grandGrad)",     textFill: "#ffffff",             special: false },
-  { label: "Mini",  fill: "#1e44c4",             textFill: "#ffffff",             special: false },
-  { label: "Minor", fill: "#0c1b6e",             textFill: "#ffffff",             special: false },
-  { label: "Major", fill: "#1e44c4",             textFill: "#ffffff",             special: false },
-  { label: "Minor", fill: "#0c1b6e",             textFill: "#ffffff",             special: false },
-  { label: "Mini",  fill: "#1e44c4",             textFill: "#ffffff",             special: false },
-  { label: "Grand", fill: "url(#grandGrad)",     textFill: "#ffffff",             special: false },
-  { label: "Major", fill: "#0c1b6e",             textFill: "#ffffff",             special: false },
+  { label: "Ultra", fill: "url(#ultraSegGrad)", textFill: "url(#ultraTxt)", special: true  },
+  { label: "Mini",  fill: "#091650",            textFill: "#ffffff",         special: false },
+  { label: "Minor", fill: "#1b40d4",            textFill: "#ffffff",         special: false },
+  { label: "Major", fill: "#091650",            textFill: "#ffffff",         special: false },
+  { label: "Grand", fill: "url(#grandGrad)",    textFill: "#ffffff",         special: false },
+  { label: "Mini",  fill: "#1b40d4",            textFill: "#ffffff",         special: false },
+  { label: "Minor", fill: "#091650",            textFill: "#ffffff",         special: false },
+  { label: "Major", fill: "#1b40d4",            textFill: "#ffffff",         special: false },
+  { label: "Minor", fill: "#091650",            textFill: "#ffffff",         special: false },
+  { label: "Mini",  fill: "#1b40d4",            textFill: "#ffffff",         special: false },
+  { label: "Grand", fill: "url(#grandGrad)",    textFill: "#ffffff",         special: false },
+  { label: "Major", fill: "#091650",            textFill: "#ffffff",         special: false },
 ];
 
-// SVG geometry — viewBox 0 0 240 260, wheel centre at (120,138)
-const N     = SEGMENTS.length;
-const ANGLE = 360 / N;          // 30° per segment
-const WCX   = 120;              // wheel centre x
-const WCY   = 138;              // wheel centre y (shifted down so pointer fits above)
-const WR    = 90;               // segment outer radius
-const RING_OUTER = 110;         // gold ring outer radius
+// ─── Wheel SVG geometry (wheel only — pointer is a separate static element) ──
+const N          = SEGMENTS.length;
+const ANGLE      = 360 / N;   // 30° per segment
+const WCX        = 107;       // wheel centre x in its own 214×214 SVG
+const WCY        = 107;       // wheel centre y
+const WR         = 86;        // segment outer radius
+const RING_OUTER = 104;       // gold ring outer radius (ring thickness = 18)
 
 function wSegPath(i: number): string {
   const toRad = (d: number) => (d * Math.PI) / 180;
@@ -85,107 +84,125 @@ function wSegPath(i: number): string {
 function wLabelPos(i: number) {
   const toRad = (d: number) => (d * Math.PI) / 180;
   const mid = i * ANGLE - 90 + ANGLE / 2;
-  const lr  = WR * 0.61;
-  return {
-    x:      WCX + lr * Math.cos(toRad(mid)),
-    y:      WCY + lr * Math.sin(toRad(mid)),
-    rotate: mid,
-  };
+  const lr  = WR * 0.60;
+  return { x: WCX + lr * Math.cos(toRad(mid)), y: WCY + lr * Math.sin(toRad(mid)), rotate: mid };
 }
 
 function JackpotWheel() {
+  // Container: 214px wide, 244px tall (30px above wheel for pointer gem)
+  // Wheel SVG occupies bottom 214px (y: 30→244 in container)
+  // Pointer SVG occupies top 48px, centered
+  const SPIN = "spin 5.8s linear infinite";
+  const ultraLbl = wLabelPos(0);
+
   return (
-    <div className="shrink-0" style={{ width: 186, height: 204 }}>
-      <div style={{ animation: "spin 5.8s linear infinite" }}>
-        <svg viewBox="0 0 240 260" width={186} height={204} style={{ display: "block", overflow: "visible" }}>
+    <div className="relative shrink-0" style={{ width: 214, height: 244 }}>
+
+      {/* ── Static pointer — never rotates ── */}
+      <div style={{ position: "absolute", top: 0, left: "50%", transform: "translateX(-50%)", zIndex: 20, pointerEvents: "none" }}>
+        <svg width="44" height="52" viewBox="0 0 44 52" style={{ display: "block", overflow: "visible" }}>
           <defs>
-            {/* ── Gold outer ring ── */}
-            <radialGradient id="goldRing" cx="50%" cy="28%" r="72%">
-              <stop offset="0%"   stopColor="#fff0a0" />
-              <stop offset="30%"  stopColor="#e8b030" />
-              <stop offset="65%"  stopColor="#c07010" />
-              <stop offset="100%" stopColor="#6a3800" />
+            <radialGradient id="gemG" cx="32%" cy="28%" r="68%">
+              <stop offset="0%"   stopColor="#fff8d0" />
+              <stop offset="40%"  stopColor="#f0b828" />
+              <stop offset="100%" stopColor="#6a3600" />
             </radialGradient>
-            {/* Gold ring highlight overlay */}
-            <radialGradient id="ringSheen" cx="50%" cy="20%" r="60%">
-              <stop offset="0%"   stopColor="rgba(255,255,200,0.45)" />
+            <linearGradient id="arrG" x1="50%" y1="0%" x2="50%" y2="100%">
+              <stop offset="0%"   stopColor="#fff090" />
+              <stop offset="40%"  stopColor="#e0a018" />
+              <stop offset="100%" stopColor="#9a5808" />
+            </linearGradient>
+            <filter id="pF" x="-40%" y="-40%" width="180%" height="180%">
+              <feDropShadow dx="0" dy="3" stdDeviation="4" floodColor="rgba(0,0,0,0.65)" />
+            </filter>
+          </defs>
+          <g filter="url(#pF)">
+            {/* Arrow body — wide triangle pointing down */}
+            <polygon points="22,52 2,26 42,26"
+              fill="url(#arrG)" stroke="#7a4400" strokeWidth="1.5" strokeLinejoin="round" />
+            {/* Metallic centre highlight strip */}
+            <polygon points="22,47 12,26 32,26"
+              fill="rgba(255,255,180,0.28)" stroke="none" />
+            {/* Gem sphere */}
+            <circle cx="22" cy="14" r="13" fill="url(#gemG)" stroke="#b07810" strokeWidth="1.8" />
+            {/* Gem specular — large soft */}
+            <circle cx="15" cy="8"  r="5"   fill="rgba(255,255,220,0.60)" />
+            {/* Gem specular — sharp dot */}
+            <circle cx="13" cy="6"  r="2"   fill="rgba(255,255,255,0.90)" />
+          </g>
+        </svg>
+      </div>
+
+      {/* ── Spinning wheel ── */}
+      <div style={{ position: "absolute", bottom: 0, left: 0, width: 214, height: 214, animation: SPIN }}>
+        <svg viewBox="0 0 214 214" width={214} height={214} style={{ display: "block", overflow: "visible" }}>
+          <defs>
+            {/* Gold ring */}
+            <radialGradient id="gRing" cx="50%" cy="26%" r="74%">
+              <stop offset="0%"   stopColor="#fff4b0" />
+              <stop offset="25%"  stopColor="#f0c030" />
+              <stop offset="60%"  stopColor="#c07810" />
+              <stop offset="100%" stopColor="#5e3000" />
+            </radialGradient>
+            <radialGradient id="gSheen" cx="50%" cy="18%" r="55%">
+              <stop offset="0%"   stopColor="rgba(255,255,200,0.5)" />
               <stop offset="100%" stopColor="rgba(255,255,200,0)" />
             </radialGradient>
-            {/* ── Ultra segment fill — warm gold-orange ── */}
+            {/* Ultra segment fill */}
             <linearGradient id="ultraSegGrad" x1="50%" y1="0%" x2="50%" y2="100%">
-              <stop offset="0%"   stopColor="#f0c040" />
+              <stop offset="0%"   stopColor="#f8c838" />
               <stop offset="100%" stopColor="#c07010" />
             </linearGradient>
-            {/* ── Ultra text — pink-purple iridescent ── */}
-            <linearGradient id="ultraTextGrad" gradientUnits="userSpaceOnUse"
-              x1={WCX - 14} y1={WCY - WR * 0.61 - 8}
-              x2={WCX + 14} y2={WCY - WR * 0.61 + 8}>
-              <stop offset="0%"   stopColor="#ff80f0" />
-              <stop offset="45%"  stopColor="#a060ff" />
-              <stop offset="100%" stopColor="#ffe060" />
+            {/* Ultra text — iridescent pink→violet→gold */}
+            <linearGradient id="ultraTxt" gradientUnits="userSpaceOnUse"
+              x1={ultraLbl.x - 16} y1={ultraLbl.y - 6}
+              x2={ultraLbl.x + 16} y2={ultraLbl.y + 6}>
+              <stop offset="0%"   stopColor="#ff70e8" />
+              <stop offset="40%"  stopColor="#8844ff" />
+              <stop offset="100%" stopColor="#ffe050" />
             </linearGradient>
-            {/* ── Grand segment fill — amber gradient ── */}
+            {/* Grand segment */}
             <linearGradient id="grandGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%"   stopColor="#e09828" />
-              <stop offset="100%" stopColor="#a86010" />
+              <stop offset="0%"   stopColor="#e8a020" />
+              <stop offset="100%" stopColor="#9a5c08" />
             </linearGradient>
-            {/* ── Pointer gradient ── */}
-            <linearGradient id="pointerGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%"   stopColor="#fff0a0" />
-              <stop offset="40%"  stopColor="#e8a820" />
-              <stop offset="100%" stopColor="#c07010" />
-            </linearGradient>
-            {/* ── Gem (pointer finial) ── */}
-            <radialGradient id="gemGrad" cx="35%" cy="30%" r="65%">
-              <stop offset="0%"   stopColor="#fff8c0" />
-              <stop offset="50%"  stopColor="#e8a820" />
-              <stop offset="100%" stopColor="#7a4800" />
-            </radialGradient>
-            {/* ── Hub — black glossy ball ── */}
-            <radialGradient id="hubGrad" cx="30%" cy="25%" r="70%">
-              <stop offset="0%"   stopColor="#505050" />
-              <stop offset="35%"  stopColor="#141414" />
+            {/* Hub */}
+            <radialGradient id="hubG" cx="30%" cy="26%" r="70%">
+              <stop offset="0%"   stopColor="#484848" />
+              <stop offset="40%"  stopColor="#111111" />
               <stop offset="100%" stopColor="#000000" />
             </radialGradient>
-            {/* Text drop shadow */}
-            <filter id="tShadow" x="-15%" y="-15%" width="130%" height="130%">
-              <feDropShadow dx="0" dy="0" stdDeviation="1.2" floodColor="rgba(0,0,0,0.7)" />
-            </filter>
-            {/* Pointer drop shadow */}
-            <filter id="ptrShadow" x="-30%" y="-30%" width="160%" height="160%">
-              <feDropShadow dx="0" dy="2" stdDeviation="3" floodColor="rgba(0,0,0,0.6)" />
+            {/* Text shadow */}
+            <filter id="tF" x="-20%" y="-20%" width="140%" height="140%">
+              <feDropShadow dx="0" dy="0" stdDeviation="1.5" floodColor="rgba(0,0,0,0.8)" />
             </filter>
           </defs>
 
-          {/* ── Outer gold ring ── */}
-          <circle cx={WCX} cy={WCY} r={RING_OUTER}     fill="url(#goldRing)" />
-          <circle cx={WCX} cy={WCY} r={RING_OUTER}     fill="url(#ringSheen)" />
-          {/* Outer dark border */}
-          <circle cx={WCX} cy={WCY} r={RING_OUTER + 1} fill="none" stroke="#3a2000" strokeWidth={2} />
-          {/* Inner dark separator between ring and segments */}
-          <circle cx={WCX} cy={WCY} r={WR + 2}         fill="#0a0800" />
+          {/* Outer gold ring */}
+          <circle cx={WCX} cy={WCY} r={RING_OUTER + 1} fill="#3a1e00" />
+          <circle cx={WCX} cy={WCY} r={RING_OUTER}     fill="url(#gRing)" />
+          <circle cx={WCX} cy={WCY} r={RING_OUTER}     fill="url(#gSheen)" />
+          {/* Ring inner dark separator */}
+          <circle cx={WCX} cy={WCY} r={WR + 2}         fill="#04030e" />
 
-          {/* ── Segments ── */}
+          {/* Segments */}
           {SEGMENTS.map((seg, i) => {
             const { x, y, rotate } = wLabelPos(i);
             return (
               <g key={i}>
-                <path d={wSegPath(i)} fill={seg.fill} stroke="#06060e" strokeWidth={1.2} />
-                {/* Inner radial highlight for depth */}
-                <path d={wSegPath(i)} fill="rgba(255,255,255,0.04)" stroke="none" />
+                <path d={wSegPath(i)} fill={seg.fill} stroke="#04030e" strokeWidth={1.5} />
                 <text
                   x={x} y={y}
-                  textAnchor="middle"
-                  dominantBaseline="middle"
+                  textAnchor="middle" dominantBaseline="middle"
                   transform={`rotate(${rotate},${x},${y})`}
-                  fontSize={seg.special ? 13 : 11}
+                  fontSize={seg.special ? 14 : 12}
                   fontWeight="bold"
                   fontFamily='"Arial Rounded MT Bold","Helvetica Rounded",Arial,sans-serif'
                   fill={seg.textFill}
-                  stroke={seg.special ? "rgba(0,0,0,0.35)" : "none"}
-                  strokeWidth={0.5}
-                  filter="url(#tShadow)"
-                  paintOrder="stroke"
+                  stroke="rgba(0,0,0,0.6)"
+                  strokeWidth={seg.special ? 2.5 : 3}
+                  paintOrder="stroke fill"
+                  filter="url(#tF)"
                 >
                   {seg.label}
                 </text>
@@ -193,7 +210,7 @@ function JackpotWheel() {
             );
           })}
 
-          {/* ── Divider lines ── */}
+          {/* Dividers */}
           {SEGMENTS.map((_, i) => {
             const toRad = (d: number) => (d * Math.PI) / 180;
             const deg = i * ANGLE - 90;
@@ -202,40 +219,20 @@ function JackpotWheel() {
                 x1={WCX} y1={WCY}
                 x2={WCX + (WR + 2) * Math.cos(toRad(deg))}
                 y2={WCY + (WR + 2) * Math.sin(toRad(deg))}
-                stroke="#06060e" strokeWidth={1.4}
+                stroke="#04030e" strokeWidth={1.8}
               />
             );
           })}
 
-          {/* ── Gold ring inner highlight rim ── */}
-          <circle cx={WCX} cy={WCY} r={WR + 8} fill="none" stroke="rgba(255,220,80,0.25)" strokeWidth={2.5} />
-          <circle cx={WCX} cy={WCY} r={RING_OUTER - 4} fill="none" stroke="rgba(255,240,130,0.18)" strokeWidth={1.5} />
+          {/* Ring highlight rims */}
+          <circle cx={WCX} cy={WCY} r={WR + 10}        fill="none" stroke="rgba(255,215,60,0.22)" strokeWidth={3} />
+          <circle cx={WCX} cy={WCY} r={RING_OUTER - 5} fill="none" stroke="rgba(255,245,140,0.20)" strokeWidth={2} />
 
-          {/* ── Centre hub — black glossy ball ── */}
-          <circle cx={WCX} cy={WCY} r={13} fill="url(#hubGrad)" />
-          <circle cx={WCX} cy={WCY} r={13} fill="none" stroke="rgba(180,120,0,0.5)" strokeWidth={1.5} />
-          <circle cx={WCX - 4} cy={WCY - 4} r={4}   fill="rgba(255,255,255,0.18)" />
-          <circle cx={WCX - 5.5} cy={WCY - 5.5} r={1.5} fill="rgba(255,255,255,0.6)" />
-
-          {/* ── Pointer (rendered on top, does NOT spin — but lives inside the SVG
-               so it stays aligned; the spin animation rotates the whole SVG but
-               we counter-rotate the pointer group) ── */}
-          <g filter="url(#ptrShadow)" style={{ animation: "spinReverse 5.8s linear infinite" }}>
-            {/* Arrow triangle body */}
-            <polygon
-              points={`${WCX},${WCY - WR - 2} ${WCX - 13},${WCY - RING_OUTER + 4} ${WCX + 13},${WCY - RING_OUTER + 4}`}
-              fill="url(#pointerGrad)"
-              stroke="#a06000"
-              strokeWidth={1}
-              strokeLinejoin="round"
-            />
-            {/* Gem / finial circle at top */}
-            <circle cx={WCX} cy={WCY - RING_OUTER - 5} r={10}
-              fill="url(#gemGrad)" stroke="#c08820" strokeWidth={1.5} />
-            {/* Gem highlight */}
-            <circle cx={WCX - 3} cy={WCY - RING_OUTER - 8} r={3}
-              fill="rgba(255,255,220,0.7)" />
-          </g>
+          {/* Centre hub — black glossy ball */}
+          <circle cx={WCX} cy={WCY} r={14} fill="url(#hubG)" />
+          <circle cx={WCX} cy={WCY} r={14} fill="none" stroke="rgba(160,100,0,0.45)" strokeWidth={1.5} />
+          <circle cx={WCX - 4.5} cy={WCY - 4.5} r={4.5} fill="rgba(255,255,255,0.17)" />
+          <circle cx={WCX - 6}   cy={WCY - 6}   r={1.8} fill="rgba(255,255,255,0.65)" />
         </svg>
       </div>
     </div>
@@ -426,7 +423,6 @@ function JackpotWidget() {
 
       <style>{`
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        @keyframes spinReverse { from { transform: rotate(0deg); } to { transform: rotate(-360deg); } }
         @keyframes jackpotPop {
           0%   { transform: scale(0.4); opacity: 0; filter: drop-shadow(0 0 28px rgba(246,180,73,1)) drop-shadow(0 2px 6px rgba(0,0,0,0.8)); }
           60%  { transform: scale(1.22); opacity: 1; }
