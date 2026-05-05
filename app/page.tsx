@@ -48,7 +48,7 @@ const STEP_SEQUENCE = [18, 14, 23, 11, 17, 20, 13, 16, 28];
 // Clockwise from top, matching the reference wheel image exactly
 // ─── Wheel segments (clockwise, index 0 = top = Ultra) ───────────────────────
 const SEGMENTS = [
-  { label: "Ultra", fill: "url(#ultraSegGrad)", textFill: "url(#ultraTxt)", special: true  },
+  { label: "Ultra", fill: "url(#ultraSegGrad)", textFill: "url(#ultraTxtGold)", special: true  },
   { label: "Mini",  fill: "#091650",            textFill: "#ffffff",         special: false },
   { label: "Minor", fill: "#1b40d4",            textFill: "#ffffff",         special: false },
   { label: "Major", fill: "#091650",            textFill: "#ffffff",         special: false },
@@ -100,13 +100,17 @@ function JackpotWheel() {
 
       {/* ── Static pointer — never rotates ── */}
       <div style={{ position: "absolute", top: 0, left: "50%", transform: "translateX(-50%)", zIndex: 20, pointerEvents: "none" }}>
-        <svg width="44" height="52" viewBox="0 0 44 52" style={{ display: "block", overflow: "visible" }}>
+        <svg width="52" height="58" viewBox="0 0 52 58" style={{ display: "block", overflow: "visible" }}>
           <defs>
-            <radialGradient id="gemG" cx="32%" cy="28%" r="68%">
+            {/* Diamond gem facets */}
+            <linearGradient id="gemTopL" x1="0%" y1="0%" x2="100%" y2="100%">
               <stop offset="0%"   stopColor="#fff8d0" />
-              <stop offset="40%"  stopColor="#f0b828" />
-              <stop offset="100%" stopColor="#6a3600" />
-            </radialGradient>
+              <stop offset="100%" stopColor="#e8a820" />
+            </linearGradient>
+            <linearGradient id="gemBotL" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%"   stopColor="#c07810" />
+              <stop offset="100%" stopColor="#7a4400" />
+            </linearGradient>
             <linearGradient id="arrG" x1="50%" y1="0%" x2="50%" y2="100%">
               <stop offset="0%"   stopColor="#fff090" />
               <stop offset="40%"  stopColor="#e0a018" />
@@ -118,17 +122,31 @@ function JackpotWheel() {
           </defs>
           <g filter="url(#pF)">
             {/* Arrow body — wide triangle pointing down */}
-            <polygon points="22,52 2,26 42,26"
+            <polygon points="26,58 3,30 49,30"
               fill="url(#arrG)" stroke="#7a4400" strokeWidth="1.5" strokeLinejoin="round" />
             {/* Metallic centre highlight strip */}
-            <polygon points="22,47 12,26 32,26"
-              fill="rgba(255,255,180,0.28)" stroke="none" />
-            {/* Gem sphere */}
-            <circle cx="22" cy="14" r="13" fill="url(#gemG)" stroke="#b07810" strokeWidth="1.8" />
-            {/* Gem specular — large soft */}
-            <circle cx="15" cy="8"  r="5"   fill="rgba(255,255,220,0.60)" />
-            {/* Gem specular — sharp dot */}
-            <circle cx="13" cy="6"  r="2"   fill="rgba(255,255,255,0.90)" />
+            <polygon points="26,52 14,30 38,30"
+              fill="rgba(255,255,180,0.30)" stroke="none" />
+
+            {/* Diamond gem — rotated square, split into 4 facets for 3-D look */}
+            {/* top facet (lightest) */}
+            <polygon points="26,2 44,15 26,18 8,15"
+              fill="#fff4b8" stroke="#b07810" strokeWidth="1" strokeLinejoin="round" />
+            {/* right facet */}
+            <polygon points="44,15 26,28 26,18"
+              fill="#d49018" stroke="#b07810" strokeWidth="1" strokeLinejoin="round" />
+            {/* left facet */}
+            <polygon points="8,15 26,18 26,28"
+              fill="#e8a820" stroke="#b07810" strokeWidth="1" strokeLinejoin="round" />
+            {/* bottom facet (darkest) — forms the point */}
+            <polygon points="26,28 44,15 26,32 8,15"
+              fill="url(#gemBotL)" stroke="#7a4400" strokeWidth="1" strokeLinejoin="round" />
+            {/* Diamond outline */}
+            <polygon points="26,2 44,15 26,32 8,15"
+              fill="none" stroke="#c08818" strokeWidth="1.5" strokeLinejoin="round" />
+            {/* Specular highlight */}
+            <polygon points="26,4 38,13 26,15 14,13"
+              fill="rgba(255,255,230,0.55)" stroke="none" />
           </g>
         </svg>
       </div>
@@ -148,18 +166,19 @@ function JackpotWheel() {
               <stop offset="0%"   stopColor="rgba(255,255,200,0.5)" />
               <stop offset="100%" stopColor="rgba(255,255,200,0)" />
             </radialGradient>
-            {/* Ultra segment fill */}
+            {/* Ultra segment fill — pink→purple aurora (matches reference) */}
             <linearGradient id="ultraSegGrad" x1="50%" y1="0%" x2="50%" y2="100%">
-              <stop offset="0%"   stopColor="#f8c838" />
-              <stop offset="100%" stopColor="#c07010" />
+              <stop offset="0%"   stopColor="#e04888" />
+              <stop offset="45%"  stopColor="#5828b8" />
+              <stop offset="100%" stopColor="#28087a" />
             </linearGradient>
-            {/* Ultra text — iridescent pink→violet→gold */}
-            <linearGradient id="ultraTxt" gradientUnits="userSpaceOnUse"
-              x1={ultraLbl.x - 16} y1={ultraLbl.y - 6}
-              x2={ultraLbl.x + 16} y2={ultraLbl.y + 6}>
-              <stop offset="0%"   stopColor="#ff70e8" />
-              <stop offset="40%"  stopColor="#8844ff" />
-              <stop offset="100%" stopColor="#ffe050" />
+            {/* Ultra text — gold/yellow gradient */}
+            <linearGradient id="ultraTxtGold" gradientUnits="userSpaceOnUse"
+              x1={ultraLbl.x} y1={ultraLbl.y - 9}
+              x2={ultraLbl.x} y2={ultraLbl.y + 9}>
+              <stop offset="0%"   stopColor="#fff8a0" />
+              <stop offset="50%"  stopColor="#f0b020" />
+              <stop offset="100%" stopColor="#b06808" />
             </linearGradient>
             {/* Grand segment */}
             <linearGradient id="grandGrad" x1="0%" y1="0%" x2="100%" y2="100%">
