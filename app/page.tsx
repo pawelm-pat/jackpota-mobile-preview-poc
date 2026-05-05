@@ -103,88 +103,65 @@ function JackpotWheel() {
 
       {/* ── Static pointer — never rotates ── */}
       <div style={{ position: "absolute", top: 0, left: "50%", transform: "translateX(-50%)", zIndex: 20, pointerEvents: "none" }}>
-        {/* Pointer is a TRANSPARENT FRAME — gold rail edges only, centre open
-            so the rotating Ultra segment shows through underneath.
-            56×144: diamond gem top, two gold rails converge at hub (y=144). */}
+        {/* Pointer — one unified triangle: flat top cap + V-rails share the same
+            corner points (4,4) and (52,4), tip at hub (28,142).
+            Interior transparent; gold strokes on all three edges. */}
         <svg width="56" height="144" viewBox="0 0 56 144" style={{ display: "block", overflow: "visible" }}>
           <defs>
-            {/* Left rail gradient — bright gold outer, warm mid, dark inner */}
             <linearGradient id="railL" x1="0%" y1="0%" x2="100%" y2="0%">
               <stop offset="0%"   stopColor="#fff4a0" />
-              <stop offset="40%"  stopColor="#e0a018" />
+              <stop offset="45%"  stopColor="#e0a018" />
               <stop offset="100%" stopColor="#7a4400" />
             </linearGradient>
-            {/* Right rail gradient — mirror */}
             <linearGradient id="railR" x1="100%" y1="0%" x2="0%" y2="0%">
               <stop offset="0%"   stopColor="#fff4a0" />
-              <stop offset="40%"  stopColor="#e0a018" />
+              <stop offset="45%"  stopColor="#e0a018" />
               <stop offset="100%" stopColor="#7a4400" />
             </linearGradient>
-            {/* Top crossbar gradient */}
-            <linearGradient id="barG" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%"   stopColor="#fff4a0" />
+            <linearGradient id="topEdgeG" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%"   stopColor="#fff8b0" />
               <stop offset="100%" stopColor="#c07810" />
             </linearGradient>
-            {/* Diamond gem gradients */}
-            <linearGradient id="gemBotL" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%"   stopColor="#c07810" />
-              <stop offset="100%" stopColor="#7a4000" />
-            </linearGradient>
-            <filter id="pF" x="-40%" y="-10%" width="180%" height="120%">
-              <feDropShadow dx="0" dy="3" stdDeviation="4" floodColor="rgba(0,0,0,0.65)" />
+            <filter id="pF" x="-40%" y="-15%" width="180%" height="130%">
+              <feDropShadow dx="0" dy="3" stdDeviation="5" floodColor="rgba(0,0,0,0.65)" />
             </filter>
           </defs>
 
           <g filter="url(#pF)">
-            {/* ── Very subtle interior tint so frame reads as a shape ── */}
-            <polygon points="28,142 5,38 51,38"
-              fill="rgba(200,140,0,0.08)" stroke="none" />
+            {/* Full triangle tint — very subtle gold wash over interior */}
+            <polygon points="4,4 52,4 28,142"
+              fill="rgba(200,145,0,0.07)" stroke="none" />
 
-            {/* ── Left gold rail (outer edge of left arm) ── */}
-            <path d="M 5,38 L 28,142"
+            {/* Cap triangle area extra tint (top third only) */}
+            <polygon points="4,4 52,4 28,50"
+              fill="rgba(240,185,20,0.18)" stroke="none" />
+            {/* Cap metallic sheen */}
+            <polygon points="9,7 47,7 28,42"
+              fill="rgba(255,250,160,0.38)" stroke="none" />
+
+            {/* ── Left rail — full length from cap corner to hub ── */}
+            <path d="M 4,4 L 28,142"
               stroke="url(#railL)" strokeWidth="8"
               strokeLinecap="round" fill="none" />
-            {/* Left rail inner highlight */}
-            <path d="M 8,40 L 28,138"
-              stroke="rgba(255,245,160,0.45)" strokeWidth="2.5"
+            <path d="M 8,7 L 28,137"
+              stroke="rgba(255,248,160,0.42)" strokeWidth="2.5"
               strokeLinecap="round" fill="none" />
 
-            {/* ── Right gold rail ── */}
-            <path d="M 51,38 L 28,142"
+            {/* ── Right rail — full length from cap corner to hub ── */}
+            <path d="M 52,4 L 28,142"
               stroke="url(#railR)" strokeWidth="8"
               strokeLinecap="round" fill="none" />
-            {/* Right rail inner highlight */}
-            <path d="M 48,40 L 28,138"
-              stroke="rgba(255,245,160,0.45)" strokeWidth="2.5"
+            <path d="M 48,7 L 28,137"
+              stroke="rgba(255,248,160,0.42)" strokeWidth="2.5"
               strokeLinecap="round" fill="none" />
 
-            {/* ── Top crossbar connecting the two rails at ring level ── */}
-            <path d="M 4,37 L 52,37"
-              stroke="url(#barG)" strokeWidth="6"
+            {/* ── Flat top edge of cap ── */}
+            <path d="M 3,4 L 53,4"
+              stroke="url(#topEdgeG)" strokeWidth="7"
               strokeLinecap="round" fill="none" />
-            <path d="M 6,37 L 50,37"
-              stroke="rgba(255,248,180,0.55)" strokeWidth="2"
+            <path d="M 5,4 L 51,4"
+              stroke="rgba(255,252,185,0.55)" strokeWidth="2.5"
               strokeLinecap="round" fill="none" />
-
-            {/* ── Diamond gem (4 facets) ── */}
-            {/* top facet — lightest */}
-            <polygon points="28,2 52,18 28,21 4,18"
-              fill="#fff6c0" stroke="#b07810" strokeWidth="1" strokeLinejoin="round" />
-            {/* right facet */}
-            <polygon points="52,18 28,34 28,21"
-              fill="#d49018" stroke="#b07810" strokeWidth="1" strokeLinejoin="round" />
-            {/* left facet */}
-            <polygon points="4,18 28,21 28,34"
-              fill="#e8a820" stroke="#b07810" strokeWidth="1" strokeLinejoin="round" />
-            {/* bottom facet — darkest */}
-            <polygon points="28,34 52,18 28,38 4,18"
-              fill="url(#gemBotL)" stroke="#7a4000" strokeWidth="1" strokeLinejoin="round" />
-            {/* Diamond outline */}
-            <polygon points="28,2 52,18 28,38 4,18"
-              fill="none" stroke="#c08818" strokeWidth="1.8" strokeLinejoin="round" />
-            {/* Specular highlight */}
-            <polygon points="28,5 44,16 28,19 12,16"
-              fill="rgba(255,255,230,0.65)" stroke="none" />
           </g>
         </svg>
       </div>
