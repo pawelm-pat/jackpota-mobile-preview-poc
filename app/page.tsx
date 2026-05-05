@@ -103,37 +103,68 @@ function JackpotWheel() {
 
       {/* ── Static pointer — never rotates ── */}
       <div style={{ position: "absolute", top: 0, left: "50%", transform: "translateX(-50%)", zIndex: 20, pointerEvents: "none" }}>
-        {/* 56px wide, 144px tall.
-            Diamond gem:   centre (28,16), vertices (28,2)(52,18)(28,34)(4,18)
-            Triangle body: base y=36 (x 2→54), tip (28,144) — spans full Ultra segment */}
+        {/* Pointer is a TRANSPARENT FRAME — gold rail edges only, centre open
+            so the rotating Ultra segment shows through underneath.
+            56×144: diamond gem top, two gold rails converge at hub (y=144). */}
         <svg width="56" height="144" viewBox="0 0 56 144" style={{ display: "block", overflow: "visible" }}>
           <defs>
-            <linearGradient id="arrG" x1="50%" y1="0%" x2="50%" y2="100%">
+            {/* Left rail gradient — bright gold outer, warm mid, dark inner */}
+            <linearGradient id="railL" x1="0%" y1="0%" x2="100%" y2="0%">
               <stop offset="0%"   stopColor="#fff4a0" />
-              <stop offset="35%"  stopColor="#e8a820" />
-              <stop offset="100%" stopColor="#8a5000" />
+              <stop offset="40%"  stopColor="#e0a018" />
+              <stop offset="100%" stopColor="#7a4400" />
             </linearGradient>
+            {/* Right rail gradient — mirror */}
+            <linearGradient id="railR" x1="100%" y1="0%" x2="0%" y2="0%">
+              <stop offset="0%"   stopColor="#fff4a0" />
+              <stop offset="40%"  stopColor="#e0a018" />
+              <stop offset="100%" stopColor="#7a4400" />
+            </linearGradient>
+            {/* Top crossbar gradient */}
+            <linearGradient id="barG" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%"   stopColor="#fff4a0" />
+              <stop offset="100%" stopColor="#c07810" />
+            </linearGradient>
+            {/* Diamond gem gradients */}
             <linearGradient id="gemBotL" x1="0%" y1="0%" x2="0%" y2="100%">
               <stop offset="0%"   stopColor="#c07810" />
               <stop offset="100%" stopColor="#7a4000" />
             </linearGradient>
-            <filter id="pF" x="-30%" y="-10%" width="160%" height="120%">
-              <feDropShadow dx="0" dy="4" stdDeviation="5" floodColor="rgba(0,0,0,0.70)" />
+            <filter id="pF" x="-40%" y="-10%" width="180%" height="120%">
+              <feDropShadow dx="0" dy="3" stdDeviation="4" floodColor="rgba(0,0,0,0.65)" />
             </filter>
           </defs>
+
           <g filter="url(#pF)">
-            {/* ── Large triangle body: base at ring outer top, tip at wheel centre ── */}
-            <polygon points="28,144 2,36 54,36"
-              fill="url(#arrG)" stroke="#7a4200" strokeWidth="1.5" strokeLinejoin="round" />
-            {/* Metallic centre highlight strip on triangle */}
-            <polygon points="28,136 14,36 42,36"
-              fill="rgba(255,255,190,0.28)" stroke="none" />
-            {/* Left edge darkening for 3-D bevel */}
-            <polygon points="28,144 2,36 14,36"
-              fill="rgba(0,0,0,0.18)" stroke="none" />
-            {/* Right edge darkening */}
-            <polygon points="28,144 54,36 42,36"
-              fill="rgba(0,0,0,0.18)" stroke="none" />
+            {/* ── Very subtle interior tint so frame reads as a shape ── */}
+            <polygon points="28,142 5,38 51,38"
+              fill="rgba(200,140,0,0.08)" stroke="none" />
+
+            {/* ── Left gold rail (outer edge of left arm) ── */}
+            <path d="M 5,38 L 28,142"
+              stroke="url(#railL)" strokeWidth="8"
+              strokeLinecap="round" fill="none" />
+            {/* Left rail inner highlight */}
+            <path d="M 8,40 L 28,138"
+              stroke="rgba(255,245,160,0.45)" strokeWidth="2.5"
+              strokeLinecap="round" fill="none" />
+
+            {/* ── Right gold rail ── */}
+            <path d="M 51,38 L 28,142"
+              stroke="url(#railR)" strokeWidth="8"
+              strokeLinecap="round" fill="none" />
+            {/* Right rail inner highlight */}
+            <path d="M 48,40 L 28,138"
+              stroke="rgba(255,245,160,0.45)" strokeWidth="2.5"
+              strokeLinecap="round" fill="none" />
+
+            {/* ── Top crossbar connecting the two rails at ring level ── */}
+            <path d="M 4,37 L 52,37"
+              stroke="url(#barG)" strokeWidth="6"
+              strokeLinecap="round" fill="none" />
+            <path d="M 6,37 L 50,37"
+              stroke="rgba(255,248,180,0.55)" strokeWidth="2"
+              strokeLinecap="round" fill="none" />
 
             {/* ── Diamond gem (4 facets) ── */}
             {/* top facet — lightest */}
@@ -153,7 +184,7 @@ function JackpotWheel() {
               fill="none" stroke="#c08818" strokeWidth="1.8" strokeLinejoin="round" />
             {/* Specular highlight */}
             <polygon points="28,5 44,16 28,19 12,16"
-              fill="rgba(255,255,230,0.60)" stroke="none" />
+              fill="rgba(255,255,230,0.65)" stroke="none" />
           </g>
         </svg>
       </div>
