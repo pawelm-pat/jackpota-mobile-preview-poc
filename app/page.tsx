@@ -2,10 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 
-// Proxy routes keep everything same-origin so SameSite=Strict cookies survive.
-// The proxy strips X-Frame-Options / CSP frame-ancestors from responses.
-const HOME_URL = "/api/proxy/home";
-const LOGIN_URL = "/api/proxy/login";
+const HOME_URL = "https://www.jackpota.com/home";
+const LOGIN_URL = "https://www.jackpota.com/login";
 type ViewMode = "loggedOut" | "loggedIn";
 
 function ViewToggle({
