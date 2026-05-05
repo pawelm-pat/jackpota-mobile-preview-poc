@@ -89,64 +89,71 @@ function wLabelPos(i: number) {
 }
 
 function JackpotWheel() {
-  // Container: 214px wide, 244px tall (30px above wheel for pointer gem)
-  // Wheel SVG occupies bottom 214px (y: 30→244 in container)
-  // Pointer SVG occupies top 48px, centered
+  // Layout (all px, container = 214 wide × 247 tall):
+  //   Wheel SVG 214×214 sits at the BOTTOM  → wheel.top = 33px in container
+  //   Hub centre in container               → 33 + WCY(107) = 140px
+  //   Pointer SVG 56 wide × 144 tall, top:0 → tip at y=144 ≈ hub (140) ✓
+  //   Ring outer top in container           → 33 + (107-RING_OUTER) = 33+3 = 36
+  //   Pointer triangle base at y=36         → aligns with ring outer top ✓
   const SPIN = "spin 5.8s linear infinite";
   const ultraLbl = wLabelPos(0);
 
   return (
-    <div className="relative shrink-0" style={{ width: 214, height: 244 }}>
+    <div className="relative shrink-0" style={{ width: 214, height: 247 }}>
 
       {/* ── Static pointer — never rotates ── */}
       <div style={{ position: "absolute", top: 0, left: "50%", transform: "translateX(-50%)", zIndex: 20, pointerEvents: "none" }}>
-        <svg width="52" height="58" viewBox="0 0 52 58" style={{ display: "block", overflow: "visible" }}>
+        {/* 56px wide, 144px tall.
+            Diamond gem:   centre (28,16), vertices (28,2)(52,18)(28,34)(4,18)
+            Triangle body: base y=36 (x 2→54), tip (28,144) — spans full Ultra segment */}
+        <svg width="56" height="144" viewBox="0 0 56 144" style={{ display: "block", overflow: "visible" }}>
           <defs>
-            {/* Diamond gem facets */}
-            <linearGradient id="gemTopL" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%"   stopColor="#fff8d0" />
-              <stop offset="100%" stopColor="#e8a820" />
-            </linearGradient>
-            <linearGradient id="gemBotL" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%"   stopColor="#c07810" />
-              <stop offset="100%" stopColor="#7a4400" />
-            </linearGradient>
             <linearGradient id="arrG" x1="50%" y1="0%" x2="50%" y2="100%">
-              <stop offset="0%"   stopColor="#fff090" />
-              <stop offset="40%"  stopColor="#e0a018" />
-              <stop offset="100%" stopColor="#9a5808" />
+              <stop offset="0%"   stopColor="#fff4a0" />
+              <stop offset="35%"  stopColor="#e8a820" />
+              <stop offset="100%" stopColor="#8a5000" />
             </linearGradient>
-            <filter id="pF" x="-40%" y="-40%" width="180%" height="180%">
-              <feDropShadow dx="0" dy="3" stdDeviation="4" floodColor="rgba(0,0,0,0.65)" />
+            <linearGradient id="gemBotL" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%"   stopColor="#c07810" />
+              <stop offset="100%" stopColor="#7a4000" />
+            </linearGradient>
+            <filter id="pF" x="-30%" y="-10%" width="160%" height="120%">
+              <feDropShadow dx="0" dy="4" stdDeviation="5" floodColor="rgba(0,0,0,0.70)" />
             </filter>
           </defs>
           <g filter="url(#pF)">
-            {/* Arrow body — wide triangle pointing down */}
-            <polygon points="26,58 3,30 49,30"
-              fill="url(#arrG)" stroke="#7a4400" strokeWidth="1.5" strokeLinejoin="round" />
-            {/* Metallic centre highlight strip */}
-            <polygon points="26,52 14,30 38,30"
-              fill="rgba(255,255,180,0.30)" stroke="none" />
+            {/* ── Large triangle body: base at ring outer top, tip at wheel centre ── */}
+            <polygon points="28,144 2,36 54,36"
+              fill="url(#arrG)" stroke="#7a4200" strokeWidth="1.5" strokeLinejoin="round" />
+            {/* Metallic centre highlight strip on triangle */}
+            <polygon points="28,136 14,36 42,36"
+              fill="rgba(255,255,190,0.28)" stroke="none" />
+            {/* Left edge darkening for 3-D bevel */}
+            <polygon points="28,144 2,36 14,36"
+              fill="rgba(0,0,0,0.18)" stroke="none" />
+            {/* Right edge darkening */}
+            <polygon points="28,144 54,36 42,36"
+              fill="rgba(0,0,0,0.18)" stroke="none" />
 
-            {/* Diamond gem — rotated square, split into 4 facets for 3-D look */}
-            {/* top facet (lightest) */}
-            <polygon points="26,2 44,15 26,18 8,15"
-              fill="#fff4b8" stroke="#b07810" strokeWidth="1" strokeLinejoin="round" />
+            {/* ── Diamond gem (4 facets) ── */}
+            {/* top facet — lightest */}
+            <polygon points="28,2 52,18 28,21 4,18"
+              fill="#fff6c0" stroke="#b07810" strokeWidth="1" strokeLinejoin="round" />
             {/* right facet */}
-            <polygon points="44,15 26,28 26,18"
+            <polygon points="52,18 28,34 28,21"
               fill="#d49018" stroke="#b07810" strokeWidth="1" strokeLinejoin="round" />
             {/* left facet */}
-            <polygon points="8,15 26,18 26,28"
+            <polygon points="4,18 28,21 28,34"
               fill="#e8a820" stroke="#b07810" strokeWidth="1" strokeLinejoin="round" />
-            {/* bottom facet (darkest) — forms the point */}
-            <polygon points="26,28 44,15 26,32 8,15"
-              fill="url(#gemBotL)" stroke="#7a4400" strokeWidth="1" strokeLinejoin="round" />
+            {/* bottom facet — darkest */}
+            <polygon points="28,34 52,18 28,38 4,18"
+              fill="url(#gemBotL)" stroke="#7a4000" strokeWidth="1" strokeLinejoin="round" />
             {/* Diamond outline */}
-            <polygon points="26,2 44,15 26,32 8,15"
-              fill="none" stroke="#c08818" strokeWidth="1.5" strokeLinejoin="round" />
+            <polygon points="28,2 52,18 28,38 4,18"
+              fill="none" stroke="#c08818" strokeWidth="1.8" strokeLinejoin="round" />
             {/* Specular highlight */}
-            <polygon points="26,4 38,13 26,15 14,13"
-              fill="rgba(255,255,230,0.55)" stroke="none" />
+            <polygon points="28,5 44,16 28,19 12,16"
+              fill="rgba(255,255,230,0.60)" stroke="none" />
           </g>
         </svg>
       </div>
